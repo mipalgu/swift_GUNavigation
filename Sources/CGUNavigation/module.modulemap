@@ -1,0 +1,6 @@
+module CGUNavigation [system] {
+  link "gunavigation"
+  umbrella header "libgunavigation_bridging.h"
+  export *
+  module * { export * }
+}
