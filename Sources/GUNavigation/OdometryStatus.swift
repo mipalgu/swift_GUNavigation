@@ -124,6 +124,16 @@ public struct OdometryStatus {
         } 
     }
 
+    public var rawValue: gu_odometry_status {
+        return gu_odometry_status(
+            forward: forward.millimetres_t.rawValue,
+            left: left.millimetres_t.rawValue,
+            turn: turn.radians_d.rawValue,
+            cartesian_coordinate: self.cartesianCoordinate?.rawValue ?? gu_cartesian_coordinate(),
+            relative_coordinate: self.relativeCoordinate?.rawValue ?? gu_relative_coordinate()
+        )
+    }
+
 
     public init(cartesian other: gu_odometry_status) {
         self.init(
@@ -165,6 +175,24 @@ public struct OdometryStatus {
         self.left = left
         self.turn = turn
         self.coordinate = .relative(coordinate)
+    }
+
+    public func trackCoordinate(lastReading: OdometryReading, currentReading: OdometryReading) -> OdometryStatus {
+        switch coordinate {
+        case .cartesian:
+            return OdometryStatus(cartesian: track_coordinate(lastReading.rawValue, currentReading.rawValue, self.rawValue))
+        case .relative:
+            return OdometryStatus(relative: track_relative_coordinate(lastReading.rawValue, currentReading.rawValue, self.rawValue))
+        }
+    }
+
+    public func trackSelf(lastReading: OdometryReading, currentReading: OdometryReading) -> OdometryStatus {
+        switch coordinate {
+        case .cartesian:
+            return OdometryStatus(cartesian: track_self(lastReading.rawValue, currentReading.rawValue, self.rawValue))
+        case .relative:
+            return OdometryStatus(relative: track_self_relative(lastReading.rawValue, currentReading.rawValue, self.rawValue))
+        }
     }
 
 }
