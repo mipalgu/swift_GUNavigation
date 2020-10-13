@@ -1,8 +1,8 @@
 /*
- * reexports.swift 
+ * OdometryReading.swift 
  * GUNavigation 
  *
- * Created by Morgan McColl on 10/10/2020.
+ * Created by Morgan McColl on 13/10/2020.
  * Copyright © 2020 Morgan McColl. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -56,6 +56,51 @@
  *
  */
 
-@_exported import CGUNavigation
-@_exported import GUUnits
-@_exported import GUCoordinates
+import CGUNavigation
+import GUUnits
+import GUCoordinates
+
+public struct OdometryReading: CTypeWrapper {
+
+    public var forward: Distance 
+
+    public var left: Distance
+
+    public var turn: Angle
+
+    public var resetCounter: UInt8
+
+    public var rawValue: gu_odometry_reading {
+        return gu_odometry_reading(
+            forward: self.forward.millimetres_t.rawValue,
+            left: self.left.millimetres_t.rawValue,
+            turn: self.turn.radians_d.rawValue,
+            resetCounter: self.resetCounter
+        )
+    }
+
+    public init(_ other: gu_odometry_reading) {
+        self.init(
+            forward: Distance(Millimetres_t(rawValue: other.forward)),
+            left: Distance(Millimetres_t(rawValue: other.left)),
+            turn: Angle(Radians_d(rawValue: other.turn)),
+            resetCounter: other.resetCounter
+        )
+    }
+
+    public init(
+        forward: Distance = Distance.millimetres(0),
+        left: Distance = Distance.millimetres(0),
+        turn: Angle = Angle.radians(0.0),
+        resetCounter: UInt8 = 0
+    ) {
+        self.forward = forward
+        self.left = left
+        self.turn = turn
+        self.resetCounter = resetCounter
+    }
+
+}
+
+extension OdometryReading: Equatable, Hashable, Codable {}
+
