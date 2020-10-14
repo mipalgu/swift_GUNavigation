@@ -58,15 +58,15 @@
 
 import CGUNavigation
 
-public struct Controller {
+public struct Controller: CTypeWrapper {
 
-    var proportionalGain: Double
+    public var proportionalGain: Double
 
-    var derivativeGain: Double
+    public var derivativeGain: Double
 
-    var integralGain: Double
+    public var integralGain: Double
 
-    var rawValue: gu_controller {
+    public var rawValue: gu_controller {
         gu_controller(
             proportionalGain: proportionalGain,
             derivativeGain: derivativeGain,
@@ -88,15 +88,15 @@ public struct Controller {
         self.integralGain = integralGain
     }
 
-    func pControl(control: Control, reading: Double, time: Double) -> Control {
+    public func pControl(control: Control, reading: Double, time: Double) -> Control {
         Control(gu_p_control(control.rawValue, self.rawValue, reading, time))
     }
 
-    func pdControl(control: Control, reading: Double, time: Double) -> Control {
+    public func pdControl(control: Control, reading: Double, time: Double) -> Control {
         Control(gu_pd_control(control.rawValue, self.rawValue, reading, time))
     }
 
-    func pidControl(control: Control, reading: Double, time: Double) -> Control {
+    public func pidControl(control: Control, reading: Double, time: Double) -> Control {
         Control(gu_pid_control(control.rawValue, self.rawValue, reading, time))
     }
 }

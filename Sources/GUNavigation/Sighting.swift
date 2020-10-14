@@ -1,8 +1,8 @@
 /*
- * Control.swift 
+ * Sighting.swift 
  * GUNavigation 
  *
- * Created by Morgan McColl on 13/10/2020.
+ * Created by Morgan McColl on 14/10/2020.
  * Copyright © 2020 Morgan McColl. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -56,70 +56,28 @@
  *
  */
 
+import GUCoordinates
 import CGUNavigation
 
-public struct Control: CTypeWrapper {
+public struct Sighting{//: CTypeWrapper {
+
+    public var location: RelativeCoordinate
+
+    public var frameNumber: UInt64
     
-    public var target: Double
-
-    public var current: Double
-
-    public var error: Double {
-        target - current
+    public var rawValue: gu_sighting {
+        return gu_sighting(location: location.rawValue, frameNumber: frameNumber)
     }
 
-    public var lastError: Double
-
-    public var totalError: Double
-
-    public var controllerOutput: Double
-
-    public var rawValue: gu_control {
-        gu_control(
-            target: target,
-            current: current,
-            error: error,
-            lastError: lastError,
-            totalError: totalError,
-            controllerOutput: controllerOutput
-        )
+    public init(_ other: gu_sighting) {
+        self.init(location: RelativeCoordinate(other.location), frameNumber: other.frameNumber)
     }
 
-    public init(_ other: gu_control) {
-        self.init(
-            target: other.target,
-            current: other.current,
-            lastError: other.lastError,
-            totalError: other.totalError,
-            controllerOutput: other.controllerOutput
-        )
+    public init(location: RelativeCoordinate, frameNumber: UInt64) {
+        self.location = location
+        self.frameNumber = frameNumber
     }
-
-    public init(
-        target: Double = 0.0,
-        current: Double = 0.0,
-        lastError: Double = 0.0,
-        totalError: Double = 0.0,
-        controllerOutput: Double = 0.0
-    ) {
-        self.target = target
-        self.current = current
-        self.lastError = lastError
-        self.totalError = totalError
-        self.controllerOutput = controllerOutput
-    }
-
-    public init(target: Double = 0.0, current: Double = 0.0) {
-        self.init(
-            target: target,
-            current: current,
-            lastError: 0.0,
-            totalError: 0.0,
-            controllerOutput: 0.0
-        )
-    }
-
 }
 
-extension Control: Equatable, Codable, Hashable {}
+extension Sighting: Hashable, Codable {}
 
