@@ -73,7 +73,7 @@ public struct Sighting{//: CTypeWrapper {
         self.init(location: RelativeCoordinate(other.location), frameNumber: other.frameNumber)
     }
 
-    public init(location: RelativeCoordinate, frameNumber: UInt64) {
+    public init(location: RelativeCoordinate = RelativeCoordinate(direction: .zero, distance: .zero), frameNumber: UInt64 = 0) {
         self.location = location
         self.frameNumber = frameNumber
     }
