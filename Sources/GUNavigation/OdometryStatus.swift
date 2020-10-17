@@ -177,6 +177,10 @@ public struct OdometryStatus {
         self.coordinate = .relative(coordinate)
     }
 
+    public init(reading: OdometryReading, coordinate: RelativeCoordinate) {
+        self.init(forward: reading.forward, left: reading.left, turn: reading.turn, coordinate: coordinate)
+    }
+
     public func trackCoordinate(lastReading: OdometryReading, currentReading: OdometryReading) -> OdometryStatus {
         switch coordinate {
         case .cartesian:
