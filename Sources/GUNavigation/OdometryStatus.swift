@@ -124,13 +124,16 @@ public struct OdometryStatus {
         } 
     }
 
+    public var reading: OdometryReading
+
     public var rawValue: gu_odometry_status {
         return gu_odometry_status(
             forward: forward.millimetres_t.rawValue,
             left: left.millimetres_t.rawValue,
             turn: turn.radians_d.rawValue,
             cartesian_coordinate: self.cartesianCoordinate?.rawValue ?? gu_cartesian_coordinate(),
-            relative_coordinate: self.relativeCoordinate?.rawValue ?? gu_relative_coordinate()
+            relative_coordinate: self.relativeCoordinate?.rawValue ?? gu_relative_coordinate(),
+            last_reading: reading.rawValue
         )
     }
 
@@ -140,7 +143,8 @@ public struct OdometryStatus {
             forward: Distance(Millimetres_t(rawValue: other.forward)),
             left: Distance(Millimetres_t(rawValue: other.left)),
             turn: Angle(Radians_d(rawValue: other.turn)),
-            coordinate: CartesianCoordinate(other.cartesian_coordinate)
+            coordinate: CartesianCoordinate(other.cartesian_coordinate),
+            reading: OdometryReading(other.last_reading)
         )
     }
 
@@ -149,7 +153,8 @@ public struct OdometryStatus {
             forward: Distance(Millimetres_t(rawValue: other.forward)),
             left: Distance(Millimetres_t(rawValue: other.left)),
             turn: Angle(Radians_d(rawValue: other.turn)),
-            coordinate: RelativeCoordinate(other.relative_coordinate)
+            coordinate: RelativeCoordinate(other.relative_coordinate),
+            reading: OdometryReading(other.last_reading)
         )
     }
 
@@ -157,45 +162,53 @@ public struct OdometryStatus {
         forward: Distance = .zero,
         left: Distance = .zero,
         turn: Angle = .zero,
-        coordinate: CartesianCoordinate
+        coordinate: CartesianCoordinate,
+        reading: OdometryReading
     ) {
         self.forward = forward
         self.left = left
         self.turn = turn
         self.coordinate = .cartesian(coordinate)
+        self.reading = reading
     }
 
     public init(
         forward: Distance = .zero,
         left: Distance = .zero,
         turn: Angle = .zero,
-        coordinate: RelativeCoordinate
+        coordinate: RelativeCoordinate,
+        reading: OdometryReading
     ) {
         self.forward = forward
         self.left = left
         self.turn = turn
         self.coordinate = .relative(coordinate)
+        self.reading = reading
     }
 
     public init(reading: OdometryReading, coordinate: RelativeCoordinate) {
-        self.init(forward: reading.forward, left: reading.left, turn: reading.turn, coordinate: coordinate)
+        self.init(forward: reading.forward, left: reading.left, turn: reading.turn, coordinate: coordinate, reading: reading)
     }
 
-    public func trackCoordinate(lastReading: OdometryReading, currentReading: OdometryReading) -> OdometryStatus {
+    public init(reading: OdometryReading, coordinate: CartesianCoordinate) {
+        self.init(forward: reading.forward, left: reading.left, turn: reading.turn, coordinate: coordinate, reading: reading)
+    }
+
+    public func trackCoordinate(currentReading: OdometryReading) -> OdometryStatus {
         switch coordinate {
         case .cartesian:
-            return OdometryStatus(cartesian: track_coordinate(lastReading.rawValue, currentReading.rawValue, self.rawValue))
+            return OdometryStatus(cartesian: track_coordinate(currentReading.rawValue, self.rawValue))
         case .relative:
-            return OdometryStatus(relative: track_relative_coordinate(lastReading.rawValue, currentReading.rawValue, self.rawValue))
+            return OdometryStatus(relative: track_relative_coordinate(currentReading.rawValue, self.rawValue))
         }
     }
 
-    public func trackSelf(lastReading: OdometryReading, currentReading: OdometryReading) -> OdometryStatus {
+    public func trackSelf(currentReading: OdometryReading) -> OdometryStatus {
         switch coordinate {
         case .cartesian:
-            return OdometryStatus(cartesian: track_self(lastReading.rawValue, currentReading.rawValue, self.rawValue))
+            return OdometryStatus(cartesian: track_self(currentReading.rawValue, self.rawValue))
         case .relative:
-            return OdometryStatus(relative: track_self_relative(lastReading.rawValue, currentReading.rawValue, self.rawValue))
+            return OdometryStatus(relative: track_self_relative(currentReading.rawValue, self.rawValue))
         }
     }
 
