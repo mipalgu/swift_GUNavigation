@@ -99,6 +99,18 @@ public struct Controller: CTypeWrapper {
     public func pidControl(control: Control, reading: Double, time: Double) -> Control {
         Control(gu_pid_control(control.rawValue, self.rawValue, reading, time))
     }
+
+    public func pControlRel(control: Control, reading: Double, time: Double) -> Control {
+        Control(gu_p_control_rel(control.rawValue, self.rawValue, reading, time))
+    }
+
+    public func pdControlRel(control: Control, reading: Double, time: Double) -> Control {
+        Control(gu_pd_control_rel(control.rawValue, self.rawValue, reading, time))
+    }
+
+    public func pidControlRel(control: Control, reading: Double, time: Double) -> Control {
+        Control(gu_pid_control_rel(control.rawValue, self.rawValue, reading, time))
+    }
 }
 
 extension Controller: Hashable, Codable {}
