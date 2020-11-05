@@ -126,6 +126,8 @@ public struct OdometryStatus {
 
     public var reading: OdometryReading
 
+    public var initialTurn: Angle
+
     public var rawValue: gu_odometry_status {
         return gu_odometry_status(
             forward: forward.millimetres_t.rawValue,
@@ -133,7 +135,8 @@ public struct OdometryStatus {
             turn: turn.radians_d.rawValue,
             cartesian_coordinate: self.cartesianCoordinate?.rawValue ?? gu_cartesian_coordinate(),
             relative_coordinate: self.relativeCoordinate?.rawValue ?? gu_relative_coordinate(),
-            last_reading: reading.rawValue
+            last_reading: reading.rawValue,
+            initial_turn: initialTurn.radians_d.rawValue
         )
     }
 
@@ -170,6 +173,7 @@ public struct OdometryStatus {
         self.turn = turn
         self.coordinate = .cartesian(coordinate)
         self.reading = reading
+        self.initialTurn = turn
     }
 
     public init(
@@ -184,6 +188,7 @@ public struct OdometryStatus {
         self.turn = turn
         self.coordinate = .relative(coordinate)
         self.reading = reading
+        self.initialTurn = turn
     }
 
     public init(reading: OdometryReading, coordinate: RelativeCoordinate) {
