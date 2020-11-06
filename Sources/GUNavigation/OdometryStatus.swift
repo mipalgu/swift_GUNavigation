@@ -98,12 +98,6 @@ public struct OdometryStatus {
         case relative(RelativeCoordinate)
     }
     
-    public var forward: Distance
-
-    public var left: Distance
-
-    public var turn: Angle
-
     private var coordinate: Coordinate
     
     public var relativeCoordinate: RelativeCoordinate? {
@@ -126,26 +120,17 @@ public struct OdometryStatus {
 
     public var reading: OdometryReading
 
-    public var initialTurn: Angle
-
     public var rawValue: gu_odometry_status {
         return gu_odometry_status(
-            forward: forward.millimetres_t.rawValue,
-            left: left.millimetres_t.rawValue,
-            turn: turn.radians_d.rawValue,
             cartesian_coordinate: self.cartesianCoordinate?.rawValue ?? gu_cartesian_coordinate(),
             relative_coordinate: self.relativeCoordinate?.rawValue ?? gu_relative_coordinate(),
-            last_reading: reading.rawValue,
-            initial_turn: initialTurn.radians_d.rawValue
+            last_reading: reading.rawValue
         )
     }
 
 
     public init(cartesian other: gu_odometry_status) {
         self.init(
-            forward: Distance(Millimetres_t(rawValue: other.forward)),
-            left: Distance(Millimetres_t(rawValue: other.left)),
-            turn: Angle(Radians_d(rawValue: other.turn)),
             coordinate: CartesianCoordinate(other.cartesian_coordinate),
             reading: OdometryReading(other.last_reading)
         )
@@ -153,50 +138,25 @@ public struct OdometryStatus {
 
     public init(relative other: gu_odometry_status) {
         self.init(
-            forward: Distance(Millimetres_t(rawValue: other.forward)),
-            left: Distance(Millimetres_t(rawValue: other.left)),
-            turn: Angle(Radians_d(rawValue: other.turn)),
             coordinate: RelativeCoordinate(other.relative_coordinate),
             reading: OdometryReading(other.last_reading)
         )
     }
 
     public init(
-        forward: Distance = .zero,
-        left: Distance = .zero,
-        turn: Angle = .zero,
         coordinate: CartesianCoordinate,
         reading: OdometryReading
     ) {
-        self.forward = forward
-        self.left = left
-        self.turn = turn
         self.coordinate = .cartesian(coordinate)
         self.reading = reading
-        self.initialTurn = turn
     }
 
     public init(
-        forward: Distance = .zero,
-        left: Distance = .zero,
-        turn: Angle = .zero,
         coordinate: RelativeCoordinate,
         reading: OdometryReading
     ) {
-        self.forward = forward
-        self.left = left
-        self.turn = turn
         self.coordinate = .relative(coordinate)
         self.reading = reading
-        self.initialTurn = turn
-    }
-
-    public init(reading: OdometryReading, coordinate: RelativeCoordinate) {
-        self.init(forward: reading.forward, left: reading.left, turn: reading.turn, coordinate: coordinate, reading: reading)
-    }
-
-    public init(reading: OdometryReading, coordinate: CartesianCoordinate) {
-        self.init(forward: reading.forward, left: reading.left, turn: reading.turn, coordinate: coordinate, reading: reading)
     }
 
     public func trackCoordinate(currentReading: OdometryReading) -> OdometryStatus {
