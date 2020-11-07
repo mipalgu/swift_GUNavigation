@@ -62,119 +62,49 @@ import GUCoordinates
 
 public struct OdometryStatus {
     
-    private enum Coordinate: Hashable, Codable {
-        
-        enum CodingKeys: String, CodingKey {
-            case type
-            case value
-        }
-        
-        init(from decoder: Decoder) throws {
-            let values = try decoder.container(keyedBy: CodingKeys.self)
-            let type = try values.decode(Bool.self, forKey: .type)
-            switch type {
-            case true:
-                let value = try values.decode(CartesianCoordinate.self, forKey: .value)
-                self = .cartesian(value)
-            case false:
-                let value = try values.decode(RelativeCoordinate.self, forKey: .value)
-                self = .relative(value)
-            }
-        }
-        
-        func encode(to encoder: Encoder) throws {
-            var container = encoder.container(keyedBy: CodingKeys.self)
-            switch self {
-            case .cartesian(let coordinate):
-                try container.encode(true, forKey: .type)
-                try container.encode(coordinate, forKey: .value)
-            case .relative(let coordinate):
-                try container.encode(false, forKey: .type)
-                try container.encode(coordinate, forKey: .value)
-            }
-        }
-        
-        case cartesian(CartesianCoordinate)
-        case relative(RelativeCoordinate)
-    }
-    
-    private var coordinate: Coordinate
-    
-    public var relativeCoordinate: RelativeCoordinate? {
-        switch coordinate {
-        case .relative(let coordinate):
-            return coordinate
-        default:
-            return nil
-        }
-    }
+    public var myPosition: FieldCoordinate
 
-    public var cartesianCoordinate: CartesianCoordinate? {
-        switch coordinate {
-        case .cartesian(let coordinate):
-            return coordinate
-        default:
-            return nil
-        } 
-    }
+    public var target: RelativeCoordinate
 
     public var reading: OdometryReading
 
     public var rawValue: gu_odometry_status {
         return gu_odometry_status(
-            cartesian_coordinate: self.cartesianCoordinate?.rawValue ?? gu_cartesian_coordinate(),
-            relative_coordinate: self.relativeCoordinate?.rawValue ?? gu_relative_coordinate(),
+            my_position: myPosition.rawValue,
+            target: target.rawValue,
             last_reading: reading.rawValue
         )
     }
 
 
-    public init(cartesian other: gu_odometry_status) {
+    public init(_ other: gu_odometry_status) {
         self.init(
-            coordinate: CartesianCoordinate(other.cartesian_coordinate),
-            reading: OdometryReading(other.last_reading)
-        )
-    }
-
-    public init(relative other: gu_odometry_status) {
-        self.init(
-            coordinate: RelativeCoordinate(other.relative_coordinate),
+            myPosition: FieldCoordinate(other.my_position),
+            target: RelativeCoordinate(other.target),
             reading: OdometryReading(other.last_reading)
         )
     }
 
     public init(
-        coordinate: CartesianCoordinate,
+        myPosition: FieldCoordinate,
+        target: RelativeCoordinate,
         reading: OdometryReading
     ) {
-        self.coordinate = .cartesian(coordinate)
+        self.myPosition = myPosition
+        self.target = target
         self.reading = reading
     }
 
-    public init(
-        coordinate: RelativeCoordinate,
-        reading: OdometryReading
-    ) {
-        self.coordinate = .relative(coordinate)
-        self.reading = reading
+    public init(reading: OdometryReading, target: RelativeCoordinate) {
+        self.init(create_status(reading.rawValue, target.rawValue))
     }
 
-    public func trackCoordinate(currentReading: OdometryReading) -> OdometryStatus {
-        switch coordinate {
-        case .cartesian:
-            return OdometryStatus(cartesian: track_coordinate(currentReading.rawValue, self.rawValue))
-        case .relative:
-            return OdometryStatus(relative: track_relative_coordinate(currentReading.rawValue, self.rawValue))
-        }
+    public init(reading: OdometryReading) {
+        self.init(create_status_for_self(reading.rawValue))
     }
 
-    public func trackSelf(currentReading: OdometryReading) -> OdometryStatus {
-        switch coordinate {
-        case .cartesian:
-            return OdometryStatus(cartesian: track_self(currentReading.rawValue, self.rawValue))
-        case .relative:
-            return OdometryStatus(relative: track_self_relative(currentReading.rawValue, self.rawValue))
-        }
+    public func track(currentReading: OdometryReading) -> OdometryStatus {
+        OdometryStatus(CGUNavigation.track(currentReading.rawValue, self.rawValue))
     }
 
 }
