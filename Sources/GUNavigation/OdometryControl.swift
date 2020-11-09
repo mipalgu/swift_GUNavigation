@@ -142,6 +142,24 @@ public struct OdometryControl: CTypeWrapper {
         ))
     }
 
+    public func fromNewControl(forwardControl: Control, leftControl: Control, turnControl: Control) -> OdometryControl {
+        OdometryControl(
+            forwardControl: forwardControl,
+            forwardController: self.forwardController,
+            leftControl: leftControl,
+            leftController: self.leftController,
+            turnControl: turnControl,
+            turnController: self.turnController
+        )
+    }
+    
+    ///
+    /// Assumes (forward, left, turn)
+    ///
+    public func fromNewControl(controls: (Control, Control, Control)) -> OdometryControl {
+        fromNewControl(forwardControl: controls.0, leftControl: controls.1, turnControl: controls.2)
+    }
+
 }
 
 
