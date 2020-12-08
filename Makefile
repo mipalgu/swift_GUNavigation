@@ -1,3 +1,3 @@
-ALL_TARGETS=host-local robot-local
+ALL_TARGETS=host-local
 
 .include "../../../mk/mipal.mk"
