@@ -14,8 +14,8 @@ let package = Package(
     dependencies: [
         // Dependencies declare other packages that this package depends on.
         // .package(url: /* package url */, from: "1.0.0"),
-        .package(name: "GUUnits", url: "ssh://git.mipal.net/git/swift_GUUnits.git", .branch("master")),
-        .package(name: "GUCoordinates", url: "ssh://git.mipal.net/git/swift_GUCoordinates.git", .branch("master"))
+        .package(name: "GUUnits", url: "ssh://git.mipal.net/Users/Shared/git/swift_GUUnits.git", .branch("master")),
+        .package(name: "GUCoordinates", url: "ssh://git.mipal.net/Users/Shared/git/swift_GUCoordinates.git", .branch("master"))
 
 
     ],
