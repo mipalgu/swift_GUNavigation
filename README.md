@@ -1,5 +1,5 @@
 GUNavigation
 ============
-*A library for performing conversions between different coordinate systems*
+*A library containing some control-loop algorithms and filters, as well as object tracking.*
 
 ---
